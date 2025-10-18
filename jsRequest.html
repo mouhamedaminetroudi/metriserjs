@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="content"></div>
+</body>
+<script>
+    function GETpost(){
+
+        let request=new XMLHttpRequest()
+        request.open("GET","https://jsonplaceholder.typicode.com/posts")
+        request.responseType="json"
+        request.send()
+        request.onload= function(){
+            console.log (typeof request.response)
+            if(request.status>=200 && request.status<300){
+                let posts=request.response
+                for(pos of posts){
+                    let content=document.getElementById("content").innerHTML+=`<h1>${pos.title}</h1>`
+                
+                
+            }
+            }else{
+                alert("error"+request.status)
+            }
+
+            
+        }
+}
+    function createnewpost(){
+        let request=new XMLHttpRequest();
+        request.open("POST","https://jsonplaceholder.typicode.com/posts");
+        //  request.responseType="json"
+        request.setRequestHeader("Accept","application/json");
+        request.setRequestHeader("Content-Type","application/json");
+        let bodyparams=`{
+            "title":"qsdq",
+            "body":"sdqd",
+            "user_id":3
+        }`
+        request.send(bodyparams);
+        request.onload=function(){
+           
+            if(request.status>=200 && request.status<300){
+                let response=request.response;
+                console.log(response);
+                console.log("the status code is "+request.status)
+                alert("the post has been created seccessfuly")
+            }else{
+                alert("error")
+            }
+            
+        }
+    }
+    
+    
+    function Updatepost(){
+        let request=new XMLHttpRequest();
+        request.open("PUT","https://jsonplaceholder.typicode.com/posts/1");
+        //  request.responseType="json"
+        request.setRequestHeader("Accept","application/json");
+        request.setRequestHeader("Content-Type","application/json");
+        let bodyparams=`{
+            "title":"HELLO WORLD🫡🫡",
+            "body":"sdqd",
+            "user_id":3
+        }`
+        request.send(bodyparams);
+        request.onload=function(){
+           
+            if(request.status>=200 && request.status<300){
+                let response=request.response;
+                console.log(response);
+                console.log("the status code is "+request.status)
+                alert("the post has been UPDATING seccessfuly")
+            }else{
+                alert("error")
+            }
+            
+        }
+    }
+    function deleted(){
+        let request=new XMLHttpRequest();
+        request.open("PUT","https://jsonplaceholder.typicode.com/posts/1");
+        //  request.responseType="json"
+        request.setRequestHeader("Accept","application/json");
+        request.setRequestHeader("Content-Type","application/json");
+        request.send();
+        request.onload=function(){
+           
+            if(request.status>=200 && request.status<300){
+                let response=request.response;
+                console.log(response);
+                console.log("the status code is "+request.status)
+                alert("the post has been DELETED seccessfuly")
+            }else{
+                alert("error")
+            }
+            
+        }
+    }
+    
+    function GETpostWithUserFilter(){
+
+let request=new XMLHttpRequest()
+request.open("GET","https://jsonplaceholder.typicode.com/posts?userId=10")
+request.responseType="json"
+request.send()
+request.onload= function(){
+    console.log (typeof request.response)
+    if(request.status>=200 && request.status<300){
+        let posts=request.response
+        for(pos of posts){
+            let content=document.getElementById("content").innerHTML+=`<h1>${pos.title}</h1>`
+        
+        
+    }
+    }else{
+        alert("error"+request.status)
+    }
+
+    
+}
+}
+GETpostWithUserFilter()
+    //deleted()
+    //Updatepost()
+    //createnewpost()
+    //GETpost() 
+/*     class Animal{
+
+        move(){
+            console.log("moving"+this.name)
+        }
+        jump(){
+            console.log("jumping"+this.color)
+        }
+        color(){
+            document.body.style.backgroundColor="red"
+        }
+        constructor(customName,customColor){
+            this.name=customName
+            this.color=customColor
+            //console.log("bonjour😁😁")
+        }
+    }
+    let lion=new Animal("asad","🦁")
+    let tiger=new Animal("tiger","🐯")
+    //let bird=new Animal("bird","🦜")
+    
+    lion.move()
+    lion.jump()
+    tiger.move()
+    tiger.jump()
+    
+    lion.color()
+    console.log(lion.name)
+    console.log(tiger.name)  */
+
+</script>
+</html>
