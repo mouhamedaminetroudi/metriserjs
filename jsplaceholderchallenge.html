@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    h1,h2,h3,h4,h5,h6{
+        margin: 0px;
+        margin-bottom: 10px;
+    }
+    #user{
+        
+        border-radius: 15px;
+        padding: 10px;
+        font-size: 20px;
+        padding-left: 20px;
+        box-shadow: 0px 5px 10px rgb(0, 0, 0,0.2);
+        cursor: pointer;
+        margin-top: 15px;
+    }
+    #user h3 {
+    background-color: white;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    width: calc(100% - 40px); 
+}
+#post{
+    
+    border-radius: 10px;
+    font-size: 20px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    margin-top: 15px;
+    
+}
+.box {
+  background-color: white;
+  border-radius: 10px;
+  font-size: 20px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  margin-top: 15px;
+}
+
+
+
+    body{
+        background: linear-gradient(45deg,rgb(76, 76, 156),rgb(133, 52, 52));
+        font-family: system-ui;
+    }
+    #user.selected{
+        border: solid #ff6200 6px;
+    }
+</style>
+<body>
+    <div id="content" style="display: flex; height: 100px;">
+      <!-- users container 30% -->
+      <div style="width: 30%;" >
+        <div id="users" style="width: 90%; height: 100px; margin: 0 auto;">
+          <div id="user" >
+            <h3>AMIN <br> AMIN@gmail.com</h3>
+            <h3>AMIN <br> AMIN@gmail.com</h3>
+            <h3>AMIN <br> AMIN@gmail.com</h3>
+            <h3>AMIN <br> AMIN@gmail.com</h3>
+          </div>
+        </div>
+      </div>  <!--  div 30% -->
+  
+      <!-- post container 70% -->
+      <div id="postconteaner" style="width: 70%;  padding: 20px 0px;">
+        <div id="posts" style="width: 90%; ">
+            <div id="post">
+                <div class="box">
+                <h3>Hello world</h3>
+                <h4>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed nisi aut obcaecati blanditiis explicabo id sunt repellendus accusamus suscipit odio assumenda quidem, praesentium perferendis a adipisci ratione nobis repellat iusto.
+                </h4>
+            </div>
+            <div class="box">
+                <h3>Hello world</h3>
+                <h4>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed nisi aut obcaecati blanditiis explicabo id sunt repellendus accusamus suscipit odio assumenda quidem, praesentium perferendis a adipisci ratione nobis repellat iusto.
+                </h4>
+            </div>
+            <div class="box">
+                <h3>Hello world</h3>
+                <h4>
+                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed nisi aut obcaecati blanditiis explicabo id sunt repellendus accusamus suscipit odio assumenda quidem, praesentium perferendis a adipisci ratione nobis repellat iusto.
+                </h4>
+            </div>
+            </div>
+        </div>
+    </div>
+</div> <!--  content -->
+  </body>
+  <script>
+      function getpost(userId){
+          let request=new XMLHttpRequest()
+          request.open("GET","https://jsonplaceholder.typicode.com/posts?userId="+userId)
+          request.responseType="json"
+          request.send()
+          request.onload = function(){
+              if (request.status>=200 && request.status<300){
+                  let posts=request.response;
+                  document.getElementById("posts").innerHTML="";
+                  for(post of posts){
+                      let content=`
+                    <div class="box">
+                        <h3>${post.title}</h3>
+                        <h4>
+                            ${post.body}
+                        </h4>
+                    </div>`
+                    document.getElementById("posts").innerHTML+=content
+                  }
+              }else{
+                  alert("error")
+              }
+          }
+      }
+      function getusers(){
+          let request=new XMLHttpRequest()
+          request.open("GET","https://jsonplaceholder.typicode.com/users")
+          request.responseType="json"
+          request.send()
+          request.onload = function(){
+              if (request.status>=200 && request.status<300){
+                  let users=request.response;
+                  document.getElementById("users").innerHTML="";
+                  for(user of users){
+                      let content=`
+                      <div id="user" onclick="getclicked(${user.id},this)">
+                        <h3>${user.name} <br> ${user.email}</h3>
+    
+                      </div>>`
+                    document.getElementById("users").innerHTML+=content
+                  }
+              }else{
+                  alert("error")
+              }
+
+          }
+          
+      }
+      getusers()
+      getpost()
+      function getclicked(id,el){
+          getpost(id)
+          let selected=document.getElementsByClassName("selected")
+          for(element of selected){
+              element.classList.remove("selected")
+          }
+          el.classList.add("selected")
+      }
+  </script>
+  
+</html>
