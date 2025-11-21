@@ -54,6 +54,10 @@
         <div class="modal-body">
           <form>
             <div class="mb-3">
+              <label for="user" class="col-form-label" >profile img</label>
+              <input type="file" class="form-control" id="regpr" >
+            </div>
+            <div class="mb-3">
               <label for="user" class="col-form-label" >Name</label>
               <input type="text" class="form-control" id="namereg" value="mohamedamin">
             </div>
@@ -75,6 +79,47 @@
     </div>
 </div>
 <!-- ===== Modal2 End ===== -->
+<!-- ===== MODAL3 post ====== -->
+
+<div class="modal fade" id="exampleModal3" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModal2Label">CREATE POST</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="user" class="col-form-label" >TITLE</label>
+            <input type="text" class="form-control" id="title" value="">
+          </div>
+            <div class="mb-3">
+            <textarea for="user" class="col-form-label" style="width: 100%; border-color: gray; border-radius: 10px; resize: none;" id="bodypost"></textarea>
+
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="col-form-label">image</label>
+            <input type="file" class="form-control" id="imgpost" >
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="newpost()">CREATE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL3 post END =======-->
+
+<!-- add post button -->
+<div  class="btn btn-outline-success mx-2 bg-primary" id="addp"  data-bs-toggle="modal" data-bs-target="#exampleModal3">
++
+</div>
+<!-- //add post button -->
 
 <!-- Navbar -->
 <div class="container pt-2">
@@ -90,10 +135,20 @@
             <div class="navbar-nav w-100 d-flex align-items-center">
               <a class="nav-link active" href="#">Home</a>
               <a class="nav-link" href="#">Profile</a>
-              <div class="ms-auto d-flex">
+              <div class="ms-auto d-flex ">
                 <button type="button" class="btn btn-outline-success mx-2" id="logbt" data-bs-toggle="modal" data-bs-target="#exampleModal">Login</button>
                 <button type="button" class="btn btn-outline-success mx-2" id="regbt"  data-bs-toggle="modal" data-bs-target="#exampleModal2">Register</button>
+                
+                <div id="profilimg">
+                <img src="postimg/amin.png" alt="" srcset="" class="rounded-circle" style="width: 40px; height: 40px;" id="navp">
+              </div>
+              <div id="pusername">
+                <b></b>
+              </div>
+
                 <button type="button" class="btn btn-outline-danger mx-2" id="logout"  onclick="logout()">Logout</button>
+              
+                
               </div>
             </div>
           </div>

@@ -1,8 +1,18 @@
-const apis = "https://tarmeezAcademy.com/api/v1";
+/* ===== infinit scroll ===== */
+window.addEventListener("scroll",function(){
+    
+    const endpage=window.innerHeight + window.pageYOffset >=this.document.body.offsetHeight ;
+    if(endpage){
+
+    }
+});
+/* ===== infinit scroll ===== */
+
+const apis ="https://tarmeezAcademy.com/api/v1";
 
 setupnavbar();
 
-axios.get(`${apis}/posts`)
+axios.get(`${apis}/posts?limit=20`)
 .then((response)=>{
     const posts = response.data.data;
     document.getElementById("posts").innerHTML = "";
@@ -40,6 +50,7 @@ axios.get(`${apis}/posts`)
             `
             document.getElementById(currentpost).innerHTML+=tagscontent
         }
+
     }
 });
 
@@ -75,16 +86,33 @@ function setupnavbar(){
     const logbt = document.getElementById("logbt");
     const regbt = document.getElementById("regbt");
     const logoutBtn = document.getElementById("logout");
+    const addp = document.getElementById("addp");
 
         if(token == null){
         logbt.style.display= "block";
         regbt.style.display= "block";
         logoutBtn.style.display="none"; 
-    }   else{
+        addp.style.display="none"; 
+    }   else{//for loged user
         logbt.style.display="none";
         regbt.style.display = "none";
         logoutBtn.style.display= "block";
-    }   
+        addp.style.display= "block";
+
+    }
+
+}
+let usern=user();
+document.getElementById("pusername").innerHTML=usern.username
+document.getElementById("regpr").src=user.profile_image
+function user(){
+    let user=null
+    const suser= localStorage.getItem("user")
+    
+    if(suser!=null){
+        user=JSON.parse(suser)
+    }
+    return user
 }
 
 function logout(){
@@ -110,19 +138,39 @@ function successful(){
     }
     alert('Nice, you triggered this alert message!','succes')
     setTimeout(()=>{
-        const Alert =bootstrap.Alert.get0rCreateInstance('#liveAlertPlaceholder')
+        const Alert =bootstrap.Alert.getOrCreateInstance('#liveAlertPlaceholder')
         Alert.close()
     },2000)
 
 }
 function regester(){
+    alert("register")
 
     const name = document.getElementById("namereg").value;
     const username = document.getElementById("userreg").value;
     const password = document.getElementById("passwordreg").value;
+    const img=document.getElementById("regpr").files[0];
     console.log(name,username,password);
+    /*      */
+    setupnavbar()
+
     
-    axios.post(`${apis}/register`, {username: username , password: password, name: name})
+    let formdata= new FormData()
+    formdata.append("name",name)
+    formdata.append("username",username)
+    formdata.append("password",password)
+    formdata.append("image",img)
+     
+    
+
+    const Headers={
+        "Content-Type":"multipart/form-data",
+    }
+
+/*      */
+    axios.post(`${apis}/register`, {username: username , password: password, name: name},formdata,{
+        headers:Headers
+    })
     .then(response => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -133,13 +181,55 @@ function regester(){
         const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
         modal.hide();
         successful()
-        setupnavbar()   
+        setupnavbar()  
+        console.log(response)
             
         })
         .catch(err => {
             console.error(err);
+            alert(err)
         
             
         });
     }
+function newpost(){
+
+    setupnavbar()
+    const title = document.getElementById("title").value;
+    const body = document.getElementById("bodypost").value;
+    const img=document.getElementById("imgpost").files[0];
+    let formdata= new FormData()
+    formdata.append("body",body)
+    formdata.append("title",title)
+    formdata.append("image",img)
+     
+    const token=localStorage.getItem("token");
+    console.log(token);
+
+    const Headers={
+        "Content-Type":"multipart/form-data",
+        "authorization":`Bearer ${token}`
+    }
+    axios.post(`${apis}/posts`, formdata,{
+        headers:Headers 
+    })
+    .then(response => {
+        const loginModalEl = document.getElementById("exampleModal3");
+        const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
+        modal.hide();
+        successful()
+        setupnavbar() 
+
+
+        
+    })
+    .catch(err => {
+        console.error(err);
+        alert(err)
+    
+        
+    });
+    
+
+}
 

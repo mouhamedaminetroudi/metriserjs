@@ -13,3 +13,17 @@ body{
 #logbt{
     display: block;
 } */
+#addp{
+    position: fixed;
+    bottom: 7%;
+    right: 5%;
+    text-align: center;
+    height: 70px;
+    font-size: 50px;
+    color: white;
+    line-height: 100%;
+    border-radius: 60px;
+    width: 70px;
+    cursor: pointer;
+    box-shadow: 0px 1px 11px rgba(0, 0, 0, 3);
+}
