@@ -1,235 +1,297 @@
-/* ===== infinit scroll ===== */
-window.addEventListener("scroll",function(){
-    
-    const endpage=window.innerHeight + window.pageYOffset >=this.document.body.offsetHeight ;
-    if(endpage){
-
+let curruntpage=1;
+let lastpage=1
+/* ===== Infinite Scroll ===== */
+window.addEventListener("scroll", function () {
+    const endpage = window.innerHeight + window.pageYOffset >= this.document.body.offsetHeight;
+    console.log("scrolling");
+    if (endpage&&curruntpage<lastpage) {
+        getPosts(false,curruntpage+1)
+        curruntpage=curruntpage+1
+        // add infinite scroll logic here
     }
 });
-/* ===== infinit scroll ===== */
+/* ===== End Infinite Scroll ===== */
 
-const apis ="https://tarmeezAcademy.com/api/v1";
+const apis = "https://tarmeezacademy.com/api/v1";
 
-setupnavbar();
 
-axios.get(`${apis}/posts?limit=20`)
-.then((response)=>{
-    const posts = response.data.data;
-    document.getElementById("posts").innerHTML = "";
-    for(let post of posts){
-        let author = post.author;
-        let content = `
-        <div class="card shadow my-2">
-            <div class="card-header">
-                <img src="postimg/amin.png" style="width:50px; height:50px;" class="rounded-circle border border-1">
-                <b>${author.username}</b>
-            </div>
-            <div class="card-body">
-                <img src="${post.image}" style="width:100%">
-                <h6 class="text-muted mt-1">${post.created_at}</h6>
-                <h5>${post.title}</h5>
-                <p>${post.body}</p>
-                <!-- pencil (outline) -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zM2.5 11.5v.5a.5.5 0 0 0 .5.5H3v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .324-.094l.106-.106  -?"/>
-                </svg>
-                <span>(${post.comments_count})comment</span>
-                <span id="tags-${post.id}">
+setupNavbar();
+getPosts();
+
+/* ------------------ GET POSTS ------------------ */
+function getPosts(reload =true ,page=1) {
+    axios.get(`${apis}/posts?limit=60&page=${page}`)
+        .then((response) => {
+            const posts = response.data.data;
+            lastpage=response.data.meta.last_page
+            if(reload){
+                document.getElementById("posts").innerHTML = ""; 
+            }
+
+            for (let post of posts) {
+
                 
-                </span>
-            </div>
-        </div>
-`
-            ;
-        document.getElementById("posts").innerHTML += content;
-        const currentpost=`tags-${post.id}`
-        document.getElementById(currentpost).innerHTML = "";
-        for(tag of post.tags){
-            let tagscontent=`
-            <button class="btn btn-sm rounded-5" style="background-color:gray;color:white;">${tag.name}</button>
-            `
-            document.getElementById(currentpost).innerHTML+=tagscontent
-        }
+                let imgSrc = (post.image && typeof post.image === "string")
+                    ? post.image
+                    : "postimg/default.jpg";
 
-    }
-});
+                let content = `
+                <div class="card shadow my-2">
+                    <div class="card-header">
+                        <img src="postimg/amin.png" 
+                             style="width:50px; height:50px;" 
+                             class="rounded-circle border">
+                        <b>${post.author.username}</b>
+                    </div>
 
-// Login function
-function login(){
+                    <div class="card-body" onclick="postclick(${post.id})"  style="cursor: pointer;">
+                        <img src="${imgSrc}" style="width:100%">
+                        <h6 class="text-muted mt-1">${post.created_at}</h6>
+                        <h5>${post.title}</h5>
+                        <p>${post.body}</p>
+
+                        <span>(${post.comments_count}) Comments</span>
+
+                        <span id="tags-${post.id}"></span>
+                    </div>
+                </div>
+                `;
+
+                document.getElementById("posts").innerHTML += content;
+
+                // Ajouter les tags
+                let tg = document.getElementById(`tags-${post.id}`);
+                for (let tag of post.tags) {
+                    tg.innerHTML += `
+                        <button class="btn btn-sm rounded-5" style="background-color:gray;color:white;">
+                            ${tag.name}
+                        </button>
+                    `;
+                }
+            }
+        });
+}
+
+/* ------------------ LOGIN ------------------ */
+function login() {
     const user = document.getElementById("user").value;
     const password = document.getElementById("password").value;
 
-    axios.post(`${apis}/login`, {username: user, password: password})
-    .then(response => {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        setupnavbar(); 
+    axios.post(`${apis}/login`, { username: user, password: password })
+        .then(response => {
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.user));
 
-        alert("Login successful!");
-        const loginModalEl = document.getElementById("exampleModal");
-        const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
-        modal.hide();
-        successful()
-        setupnavbar()   
-        
-    })
-    .catch(err => {
-        console.error(err);
-    
-        
-    });
+            setupNavbar();
+            alert("Login successful!");
+
+            const loginModalEl = document.getElementById("exampleModal");
+            const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
+            modal.hide();
+
+        })
+        .catch(err => {
+            console.error(err);
+        });
 }
 
-// Navbar setup
-function setupnavbar(){
+/* ------------------ NAVBAR ------------------ */
+function setupNavbar() {
     const token = localStorage.getItem("token");
     const logbt = document.getElementById("logbt");
     const regbt = document.getElementById("regbt");
     const logoutBtn = document.getElementById("logout");
     const addp = document.getElementById("addp");
 
-        if(token == null){
-        logbt.style.display= "block";
-        regbt.style.display= "block";
-        logoutBtn.style.display="none"; 
-        addp.style.display="none"; 
-    }   else{//for loged user
-        logbt.style.display="none";
+    if (!token) {
+        if(addp!=null){
+            addp.style.display = "none"; 
+        }
+        logbt.style.display = "block";
+        regbt.style.display = "block";
+        logoutBtn.style.display = "none";
+        
+
+    } else {
+        if(addp!=null){
+            addp.style.display = "block"; 
+        }
+        logbt.style.display = "none";
         regbt.style.display = "none";
-        logoutBtn.style.display= "block";
-        addp.style.display= "block";
+        logoutBtn.style.display = "block";
+        
 
-    }
-
-}
-let usern=user();
-document.getElementById("pusername").innerHTML=usern.username
-document.getElementById("regpr").src=user.profile_image
-function user(){
-    let user=null
-    const suser= localStorage.getItem("user")
     
-    if(suser!=null){
-        user=JSON.parse(suser)
+        const user = getUser();
+        const pusername = document.getElementById("pusername");
+        const pimg = document.getElementById("navp");
+
+        if (user && pusername) pusername.innerHTML = user.username;
+
+        if (user && pimg && user.profile_image) {
+            pimg.src = user.profile_image;
+        }
     }
-    return user
 }
 
-function logout(){
-    // Logout
-    document.getElementById("logout").addEventListener("click", ()=>{
+/* ------------------ GET USER FROM STORAGE ------------------ */
+function getUser() {
+    const suser = localStorage.getItem("user");
+    if (!suser) return null;
+    return JSON.parse(suser);
+}
+
+/* ------------------ LOGOUT ------------------ */
+function logout() {
     localStorage.clear();
-    setupnavbar();
-    
-});
+    setupNavbar();
 }
-function successful(){
-    const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
-    const alert = (message, type) => {
-     const wrapper = document.createElement('div')
-     wrapper.innerHTML = [
-    `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-    `   <div>${message}</div>`,
-    '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-    '</div>'
-  ].join('')
 
-  alertPlaceholder.append(wrapper)
-    }
-    alert('Nice, you triggered this alert message!','succes')
-    setTimeout(()=>{
-        const Alert =bootstrap.Alert.getOrCreateInstance('#liveAlertPlaceholder')
-        Alert.close()
-    },2000)
-
-}
-function regester(){
-    alert("register")
-
+/* ------------------ REGISTER ------------------ */
+function register() {
+    alert("yeeeeeeeeeeeeeeeeeeeeeeeeeeeeees")
     const name = document.getElementById("namereg").value;
     const username = document.getElementById("userreg").value;
     const password = document.getElementById("passwordreg").value;
-    const img=document.getElementById("regpr").files[0];
-    console.log(name,username,password);
-    /*      */
-    setupnavbar()
+
+    let formData = new FormData();
+    formData.append("name", name);
+    formData.append("username", username);
+    formData.append("password", password);
 
     
-    let formdata= new FormData()
-    formdata.append("name",name)
-    formdata.append("username",username)
-    formdata.append("password",password)
-    formdata.append("image",img)
-     
-    
-
-    const Headers={
-        "Content-Type":"multipart/form-data",
+    const img = document.getElementById("regpr").files[0];
+    if (img) {
+        formData.append("image", img);
     }
 
-/*      */
-    axios.post(`${apis}/register`, {username: username , password: password, name: name},formdata,{
-        headers:Headers
+    axios.post(`${apis}/register`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
     })
     .then(response => {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
-        setupnavbar(); 
-    
-        alert("regester successful!");
-        const loginModalEl = document.getElementById("exampleModal");
-        const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
+
+        setupNavbar(); 
+
+        alert("Register successful!");
+        const registerModalEl = document.getElementById("exampleModal2");
+        const modal = bootstrap.Modal.getOrCreateInstance(registerModalEl);
         modal.hide();
-        successful()
-        setupnavbar()  
-        console.log(response)
-            
+    })
+    .catch(err => {
+        console.error(err.response ? err.response.data : err);
+        alert(err);
+    });
+}
+
+
+/* ------------------ POST NEW POST ------------------ */
+function newpost() {
+    const title = document.getElementById("title").value;
+    const body = document.getElementById("bodypost").value;
+    const img = document.getElementById("imgpost").files[0];
+
+    let formdata = new FormData();
+    formdata.append("body", body);
+    formdata.append("title", title);
+    formdata.append("image", img);
+
+    const token = localStorage.getItem("token");
+
+    axios.post(`${apis}/posts`, formdata, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "authorization": `Bearer ${token}`
+        }
+    })
+        .then(response => {
+            const postModal = document.getElementById("exampleModal3");
+            const modal = bootstrap.Modal.getOrCreateInstance(postModal);
+            modal.hide();
+
+            alert("Post added!");
+            getPosts();
+
         })
         .catch(err => {
             console.error(err);
-            alert(err)
-        
-            
+            alert(err);
         });
-    }
-function newpost(){
-
-    setupnavbar()
-    const title = document.getElementById("title").value;
-    const body = document.getElementById("bodypost").value;
-    const img=document.getElementById("imgpost").files[0];
-    let formdata= new FormData()
-    formdata.append("body",body)
-    formdata.append("title",title)
-    formdata.append("image",img)
-     
-    const token=localStorage.getItem("token");
-    console.log(token);
-
-    const Headers={
-        "Content-Type":"multipart/form-data",
-        "authorization":`Bearer ${token}`
-    }
-    axios.post(`${apis}/posts`, formdata,{
-        headers:Headers 
-    })
-    .then(response => {
-        const loginModalEl = document.getElementById("exampleModal3");
-        const modal = bootstrap.Modal.getOrCreateInstance(loginModalEl);
-        modal.hide();
-        successful()
-        setupnavbar() 
-
-
-        
-    })
-    .catch(err => {
-        console.error(err);
-        alert(err)
-    
-        
-    });
-    
-
 }
+function postclick(id){
+    
+    window.location=`postdet.html?postid=${id}`
+}
+const urlparams=new URLSearchParams(window.location.search)
+const id= urlparams.get("postid")
+
+
+function getPost() {
+    axios.get(`${apis}/posts/${id}`)
+        .then((response) => {
+            console.log(response.data); 
+            
+            const post = response.data.data;
+            const comments = post.comments || [];
+            const author = post.author;
+            
+            
+
+            // author username
+            document.getElementById("auth").innerHTML = author.username;
+
+            // comments
+            let Commentscontent = ``;
+            for (let comment of comments) {
+                Commentscontent += `
+                <div class="comments" style="width:100%;">
+                    <div class="p-3" style="background-color: rgb(226, 229, 228);">
+                        <div>
+                            <img src="postimg/amin.png" class="rounded-circle" style="width: 50px; height:40px;">
+                            <b>${comment.author.username}</b>
+                        </div>
+                        <div>
+                            ${comment.body}
+                        </div>
+                    </div>
+                </div>`;
+            }
+
+            let imgSrc = (post.image && typeof post.image === "string")
+                ? post.image
+                : "postimg/default.jpg";
+
+            let content = `
+            <div class="card shadow my-2 d-flex justify-content-center" style="width:65%; margin-left:270px;">
+                <div class="card-header">
+                    <img src="postimg/amin.png" 
+                         style="width:50px; height:50px;" 
+                         class="rounded-circle border">
+                    <b>${author.username}</b>
+                </div>
+
+                <div class="card-body" style="cursor: pointer;">
+                    <img src="${imgSrc}" style="width:100%; height:500px;">
+                    <h6 class="text-muted mt-1">${post.created_at}</h6>
+                    <h5>${post.title}</h5>
+                    <p>${post.body}</p>
+
+                    <span>(${post.comments_count}) Comments</span>
+
+                    <span id="tags-${post.id}"></span>
+                </div>
+            </div>
+
+            ${Commentscontent}
+            `;
+
+            document.getElementById("post").innerHTML += content; 
+        })
+        .catch(err => console.error(err));
+}
+
+getPost();
+
+
 
